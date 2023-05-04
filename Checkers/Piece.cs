@@ -41,6 +41,23 @@ namespace Checkers
             Draw();
         }
 
+        private void PieceKing()
+        {
+            isKing = true;
+            if (isWhite)
+                PieceEllipse.Fill = Brushes.WhiteSmoke;
+            else
+                PieceEllipse.Fill = Brushes.DarkGray;
+        }
+
+        private void Move(int X, int Y)
+        {
+            this.X = X;
+            this.Y = Y;
+
+            Draw();
+        }
+
         private void MouseDown(object sender, MouseEventArgs e)
         {
             //do something here
@@ -53,6 +70,8 @@ namespace Checkers
 
             if (!board.GetBoard.Children.Contains(PieceEllipse))
                 board.GetBoard.Children.Add(PieceEllipse);
+            else
+                board.GetBoard.Children.Remove(PieceEllipse);
         }
     }
 }

@@ -22,19 +22,33 @@ namespace Snake
         public int X { get; set; }
         public int Y { get; set; }
 
-        private int size = 20;
+        private int size = 38;
+
         public Ellipse HeadImage = new Ellipse();
 
         private List<SnakePart> snakeParts = new List<SnakePart>();
         private int eatenApples;
+        private int checkpointApples = 0;
+        private int checkpointAllApples = 5;
 
         private World world;
+
+        public World GetWorld
+        {
+            get { return world; }
+        }
+
+        public List<SnakePart> SnakeParts
+        {
+            get { return snakeParts; }
+        }
 
         public int EatenApples
         {
             get { return eatenApples; }
             set { eatenApples = value; }
         }
+
         public Directions Direction
         {
             get { return direction; }
@@ -44,8 +58,6 @@ namespace Snake
         public SnakeHead(World world)
         {
             this.world = world;
-            //this.eatenApples = eatenApples;
-            //IsAlive = true;
 
             X = world.Width / 2;
             Y = world.Height / 2;
@@ -55,10 +67,10 @@ namespace Snake
             HeadImage.Height = size;
 
             snakeParts.Add(new SnakePart(this));
+            snakeParts.Add(new SnakePart(this));
 
-            Draw();
-            foreach (SnakePart part in snakeParts)
-                part.Draw(world.GetWorld);
+            //Draw();
+            //snakeParts[0].Draw(world.GetWorld);
         }
 
         public void Draw()
@@ -70,10 +82,15 @@ namespace Snake
             Grid.SetRow(HeadImage, Y);
 
             world.GetWorld.Children.Add(HeadImage);
+
+            foreach (SnakePart part in snakeParts)
+                part.Draw(world.GetWorld);
         }
 
         public void MoveSnake()
         {
+            int headPrevX = X;
+            int headPrevY = Y;
             switch (direction)
             {
                 case Directions.UP: Y--; break;
@@ -82,30 +99,39 @@ namespace Snake
                 case Directions.RIGHT: X++; break;
             }
 
-            if (Y < 0)  Y = 32;
-            if (X < 1)  X = 32;
-            if (Y > 32) Y = 0;
-            if (X > 32) X = 1;
+            if (Y < 0) Y = world.Height;
+            if (X < 0) X = world.Width;
+            if (Y > world.Height) Y = 0;
+            if (X > world.Width) X = 0;
 
-            Draw();
+            if (snakeParts.Count > 0)
+            {
+                snakeParts[0].X = headPrevX;
+                snakeParts[0].Y = headPrevY;
+                int partPrevX = snakeParts[0].X;
+                int partPrevY = snakeParts[0].Y;
+                int partPrev2X, partPrev2Y;
+                for (int i = 1; i < snakeParts.Count; i++)
+                {
+                    partPrev2X = snakeParts[i].X;
+                    partPrev2Y = snakeParts[i].Y;
+                    snakeParts[i].X = partPrevX;
+                    snakeParts[i].Y = partPrevY;
+                    partPrevX = partPrev2X;
+                    partPrevY = partPrev2Y;
 
+                    if (snakeParts[i].Y < 0) snakeParts[i].Y = world.Height;
+                    if (snakeParts[i].X < 0) snakeParts[i].X = world.Width;
+                    if (snakeParts[i].Y > world.Height) snakeParts[i].Y = 0;
+                    if (snakeParts[i].X > world.Width) snakeParts[i].X = 0;
+                }
+            }
+        }
+
+        public void Collide()
+        {
             foreach (SnakePart part in snakeParts)
             {
-                switch (direction)
-{
-                    case Directions.UP: part.Y--; break;
-                    case Directions.DOWN: part.Y++; break;
-                    case Directions.LEFT: part.X--; break;
-                    case Directions.RIGHT: part.X++; break;
-                }
-
-                if (part.Y < 0) part.Y = 32;
-                if (part.X < 1) part.X = 32;
-                if (part.Y > 32) part.Y = 0;
-                if (part.X > 32) part.X = 1;
-
-                part.Draw(world.GetWorld);
-
                 if (X == part.X & Y == part.Y)
                     Death();
             }
@@ -114,16 +140,23 @@ namespace Snake
         }
 
         private void Eat(Apple apple)
-        {  
-            eatenApples += 1;
+        {
+            checkpointApples++;
+            eatenApples++;
             snakeParts.Add(new SnakePart(this));
             apple.Init();
+
+            if (checkpointApples >= checkpointAllApples)
+            {
+                checkpointApples = 0;
+                world.Speed /= 2;
+            }
         }
 
         private void Death()
         {
             IsAlive = false;
-            eatenApples = 0;
+            //eatenApples = 0;
         }
     }
 }

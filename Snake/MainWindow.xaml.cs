@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -15,6 +16,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using static Snake.SnakeHead;
+using static System.Formats.Asn1.AsnWriter;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace Snake
@@ -29,62 +32,75 @@ namespace Snake
 
         private bool isStarted = false;
         private bool isAlive = true;
-
-        private Thread thread1;
-        private Thread thread2;
+        private bool isAIAlive = true;
 
         private SnakeAI snakeAI;
+
+        private DispatcherTimer timerGame = new DispatcherTimer();
+        private DispatcherTimer timerControl = new DispatcherTimer();
+        private DispatcherTimer timerAI = new DispatcherTimer();
 
         public MainWindow()
         {
             InitializeComponent();
 
-            thread1 = new Thread(NextThread1) { IsBackground = true };
-            thread2 = new Thread(NextThread2) { IsBackground = true };
+            timerGame.Tick += new EventHandler(timerGame_Tick);
+            timerControl.Tick += new EventHandler(timerControl_Tick);
+            timerAI.Tick += new EventHandler(timerAI_Tick);
 
             RestartButton.Content = "Start!";
             worldP = new World(WorldP, true);
             worldAI = new World(WorldAI, false);
+
             snakeAI = new SnakeAI();
             //WinnerDisplay();
         }
-        public void NextThread1()
-        {
-            int i = 0;
-            while (isAlive)
-            {
-                Dispatcher.Invoke(() => { GameLoop();});
-                Thread.Sleep(1000 / worldP.Speed);
-                i++;
-            }
-            WinnerDisplay();
-        }
 
-        public void NextThread2()
+        private void timerControl_Tick(object sender, EventArgs e)
         {
-            int i = 0;
-            while (isAlive)
-            {
-                Dispatcher.Invoke(() => { Controls(); UILoop(); });
-                Thread.Sleep(10);
-                i++;
-            }
-        }
+            GameControls();
+            snakeAI.Control();
 
-        private void GameLoop()
-        {
-            worldP.GetSnake.MoveSnake();
-            worldAI.GetSnake.MoveSnake();
-            isAlive = worldP.GetSnake.IsAlive;
-        }
+            worldP.GetSnake.Collide();
+            worldAI.GetSnake.Collide();
 
-        private void UILoop()
-        {
             PlayerText.Text = $"Player : {worldP.GetSnake.EatenApples}";
             AIText.Text = $"Computer : {worldAI.GetSnake.EatenApples}";
         }
 
-        private void Controls()
+        private void timerGame_Tick(object sender, EventArgs e)
+        {
+            worldP.GetSnake.MoveSnake();
+            worldP.GetSnake.Draw();
+
+            isAlive = worldP.GetSnake.IsAlive;
+
+            if (!isAlive)
+            {
+                timerGame.Stop();
+                timerAI.Stop();
+                timerControl.Stop();
+                WinnerDisplay();
+            }
+        }
+
+        private void timerAI_Tick(object sender, EventArgs e)
+        {
+            worldAI.GetSnake.MoveSnake();
+            worldAI.GetSnake.Draw();
+
+            isAIAlive = worldAI.GetSnake.IsAlive;
+
+            if (!isAIAlive)
+            {
+                timerGame.Stop();
+                timerAI.Stop();
+                timerControl.Stop();
+                WinnerDisplay();
+            }
+        }
+
+        private void GameControls()
         {
             if ((Keyboard.GetKeyStates(Key.W) & KeyStates.Down) > 0 | (Keyboard.GetKeyStates(Key.Up)    & KeyStates.Down) > 0)
                 worldP.GetSnake.Direction = SnakeHead.Directions.UP;
@@ -104,14 +120,21 @@ namespace Snake
             worldP.Create();
             worldAI.Create();
 
+            snakeAI.Snake = worldAI.GetSnake;
+
             worldP.GetSnake.EatenApples = 0;
             worldAI.GetSnake.EatenApples = 0;
 
             if (!isStarted)
             {
                 isStarted = true;
-                thread1.Start();
-                thread2.Start();
+
+                timerGame.Interval = TimeSpan.FromMilliseconds(500 / worldP.Speed);
+                timerAI.Interval = TimeSpan.FromMilliseconds(500 / worldAI.Speed);
+                timerControl.Interval = TimeSpan.FromMilliseconds(10);
+                timerGame.Start();
+                timerAI.Start();
+                timerControl.Start();
             }
         }
 

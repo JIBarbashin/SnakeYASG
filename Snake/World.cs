@@ -13,8 +13,8 @@ namespace Snake
     internal class World
     {
         public int Speed { get; set; } = 1;
-        public int Width { get; set; } = 32;
-        public int Height { get; set; } = 32;
+        public int Width { get; set; } = 16;
+        public int Height { get; set; } = 16;
 
         private SnakeHead snake;
         private Apple apple;
