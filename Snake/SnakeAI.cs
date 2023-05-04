@@ -11,32 +11,61 @@ namespace Snake
     {
         public SnakeHead Snake { get; set; }
         private Apple apple;
-        private Grid world;
+        private World world;
+        private Grid grid;
+
+        public void Init()
+        {
+            world = Snake.GetWorld;
+            grid = world.GetWorld;
+            apple = world.GetApple;
+        }
 
         public void Control()
         {
-            world = Snake.GetWorld.GetWorld;
-            apple = Snake.GetWorld.GetApple;
+            int appleX = Grid.GetColumn(apple.AppleImage);
+            int appleY = Grid.GetRow(apple.AppleImage);
 
-            int appleCol = Grid.GetColumn(apple.AppleImage);
-            int appleRow = Grid.GetRow(apple.AppleImage);
-
-            if (appleRow == Snake.Y)
+            if (Snake.Direction == SnakeHead.Directions.LEFT | Snake.Direction == SnakeHead.Directions.RIGHT)
             {
-                if (appleCol < Snake.X)
+                if (Snake.X == appleX)
                 {
-                    Snake.Direction = SnakeHead.Directions.LEFT;
-                }
-                else
-                {
-                    Snake.Direction = SnakeHead.Directions.RIGHT;
+                    if (Snake.Y > appleY)
+                    {
+                        if (Snake.Y - appleY < world.Height / 2)
+                            Snake.Direction = SnakeHead.Directions.UP;
+                        else
+                            Snake.Direction = SnakeHead.Directions.DOWN;
+                    }
+                    else
+                    {
+                        if (appleY - Snake.Y < world.Height / 2)
+                            Snake.Direction = SnakeHead.Directions.DOWN;
+                        else
+                            Snake.Direction = SnakeHead.Directions.UP;
+                    }
                 }
             }
-            else
+            if (Snake.Direction == SnakeHead.Directions.UP | Snake.Direction == SnakeHead.Directions.DOWN)
             {
-
+                if (Snake.Y == appleY)
+                {
+                    if (Snake.X > appleX)
+                    {
+                        if (Snake.X - appleX < world.Width / 2)
+                            Snake.Direction = SnakeHead.Directions.LEFT;
+                        else    
+                            Snake.Direction = SnakeHead.Directions.RIGHT;
+                    }
+                    else
+                    {
+                        if (appleX - Snake.X < world.Width / 2)
+                            Snake.Direction = SnakeHead.Directions.RIGHT;
+                        else
+                            Snake.Direction = SnakeHead.Directions.LEFT;
+                    }
+                }
             }
         }
-
     }
 }

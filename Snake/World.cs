@@ -12,7 +12,8 @@ namespace Snake
 {
     internal class World
     {
-        public int Speed { get; set; } = 1;
+        public double Speed { get; set; } = 5;
+        public double MaxSpeed { get; set; } = 7.5;
         public int Width { get; set; } = 16;
         public int Height { get; set; } = 16;
 
@@ -20,6 +21,7 @@ namespace Snake
         private Apple apple;
 
         private Grid world;
+        private bool[,] map;
 
         public Grid GetWorld
         {
@@ -56,6 +58,7 @@ namespace Snake
                 RowDefinition row = new RowDefinition();
                 world.RowDefinitions.Add(row);
             }
+            map = new bool[Height, Width];
         }
 
         public void Clear()
@@ -66,6 +69,14 @@ namespace Snake
 
             snake = null;
             apple = null;
+        }
+
+        public bool IsFreeCell(int x, int y)
+        {
+            if (map[y, x])
+                return true;
+            else
+                return false;
         }
     }
 }

@@ -41,8 +41,16 @@ namespace Snake
 
         public void Init()
         {
-            X = 1 + random.Next(world.Width);
-            Y = 1 + random.Next(world.Height);
+            bool spawned = false;
+
+            while (!spawned)
+            {
+                X = 1 + random.Next(world.Width - 1);
+                Y = 1 + random.Next(world.Height - 1);
+
+                if (!world.GetSnake.IsColliding(X, Y))
+                    spawned = true;
+            }
             Score = 1;
             Draw();
         }

@@ -64,16 +64,19 @@ namespace Snake
             worldP.GetSnake.Collide();
             worldAI.GetSnake.Collide();
 
-            PlayerText.Text = $"Player : {worldP.GetSnake.EatenApples}";
-            AIText.Text = $"Computer : {worldAI.GetSnake.EatenApples}";
+            isAlive = worldP.GetSnake.IsAlive;
+            isAIAlive = worldAI.GetSnake.IsAlive;
+
+            PlayerText.Text = $"Player : {worldP.GetSnake.EatenApples}/{worldP.Speed}";
+            AIText.Text = $"Computer : {worldAI.GetSnake.EatenApples}/{worldAI.Speed}";
         }
 
         private void timerGame_Tick(object sender, EventArgs e)
         {
+            timerGame.Interval = TimeSpan.FromMilliseconds(400 / worldP.Speed);
+
             worldP.GetSnake.MoveSnake();
             worldP.GetSnake.Draw();
-
-            isAlive = worldP.GetSnake.IsAlive;
 
             if (!isAlive)
             {
@@ -86,10 +89,10 @@ namespace Snake
 
         private void timerAI_Tick(object sender, EventArgs e)
         {
+            timerAI.Interval = TimeSpan.FromMilliseconds(400 / worldAI.Speed);
+
             worldAI.GetSnake.MoveSnake();
             worldAI.GetSnake.Draw();
-
-            isAIAlive = worldAI.GetSnake.IsAlive;
 
             if (!isAIAlive)
             {
@@ -102,13 +105,20 @@ namespace Snake
 
         private void GameControls()
         {
-            if ((Keyboard.GetKeyStates(Key.W) & KeyStates.Down) > 0 | (Keyboard.GetKeyStates(Key.Up)    & KeyStates.Down) > 0)
+            if ((Keyboard.GetKeyStates(Key.W) & KeyStates.Down) > 0 |
+                (Keyboard.GetKeyStates(Key.Up)    & KeyStates.Down) > 0)
                 worldP.GetSnake.Direction = SnakeHead.Directions.UP;
-            if ((Keyboard.GetKeyStates(Key.S) & KeyStates.Down) > 0 | (Keyboard.GetKeyStates(Key.Down)  & KeyStates.Down) > 0)
+
+            else if ((Keyboard.GetKeyStates(Key.S) & KeyStates.Down) > 0 |
+                (Keyboard.GetKeyStates(Key.Down)  & KeyStates.Down) > 0)
                 worldP.GetSnake.Direction = SnakeHead.Directions.DOWN;
-            if ((Keyboard.GetKeyStates(Key.A) & KeyStates.Down) > 0 | (Keyboard.GetKeyStates(Key.Left)  & KeyStates.Down) > 0)
+
+            else if((Keyboard.GetKeyStates(Key.A) & KeyStates.Down) > 0 |
+                (Keyboard.GetKeyStates(Key.Left)  & KeyStates.Down) > 0)
                 worldP.GetSnake.Direction = SnakeHead.Directions.LEFT;
-            if ((Keyboard.GetKeyStates(Key.D) & KeyStates.Down) > 0 | (Keyboard.GetKeyStates(Key.Right) & KeyStates.Down) > 0)
+
+            else if((Keyboard.GetKeyStates(Key.D) & KeyStates.Down) > 0 |
+                (Keyboard.GetKeyStates(Key.Right) & KeyStates.Down) > 0)
                 worldP.GetSnake.Direction = SnakeHead.Directions.RIGHT;
         }
 
@@ -121,6 +131,13 @@ namespace Snake
             worldAI.Create();
 
             snakeAI.Snake = worldAI.GetSnake;
+            snakeAI.Init();
+
+            isAlive = true;
+            isAIAlive = true;
+
+            worldP.Speed = 1;
+            worldAI.Speed = 1;
 
             worldP.GetSnake.EatenApples = 0;
             worldAI.GetSnake.EatenApples = 0;
@@ -129,9 +146,9 @@ namespace Snake
             {
                 isStarted = true;
 
-                timerGame.Interval = TimeSpan.FromMilliseconds(500 / worldP.Speed);
-                timerAI.Interval = TimeSpan.FromMilliseconds(500 / worldAI.Speed);
-                timerControl.Interval = TimeSpan.FromMilliseconds(10);
+                timerGame.Interval = TimeSpan.FromMilliseconds(1);
+                timerAI.Interval = TimeSpan.FromMilliseconds(1);
+                timerControl.Interval = TimeSpan.FromMilliseconds(1);
                 timerGame.Start();
                 timerAI.Start();
                 timerControl.Start();
@@ -146,7 +163,7 @@ namespace Snake
             else if (!worldAI.GetSnake.IsAlive)
                 winner = "Player";
 
-            MessageBoxResult msg = MessageBox.Show($"{winner} wins!\nPlayer: {worldP.GetSnake.EatenApples}\nComputer: {worldAI.GetSnake.EatenApples}", "Game over!");
+            MessageBoxResult msg = MessageBox.Show($"{winner} is alive!\nPlayer: {worldP.GetSnake.EatenApples}\nComputer: {worldAI.GetSnake.EatenApples}", "Game over!");
             if (msg == MessageBoxResult.OK)
             {
                 isStarted = false;
