@@ -21,6 +21,11 @@ namespace Checkers
         private Grid boardGrid;
         private List<Piece> pieces = new List<Piece>();
 
+        public List<Piece> Pieces
+        {
+            get { return pieces; }
+        }
+
         public Grid GetBoard
         {
             get { return boardGrid; }
@@ -28,6 +33,7 @@ namespace Checkers
 
         public Board(Grid board)
         {
+            Global.GameBoard = this;
             this.boardGrid = board;
         }
 

@@ -21,7 +21,6 @@ namespace Checkers
     public partial class MainWindow : Window
     {
         private Board world;
-        private int team; // 0 - White, 1 - Black
 
         public MainWindow()
         {
@@ -32,18 +31,25 @@ namespace Checkers
 
         private void Start()
         {
+            Global.CurrentTeam = 0;
+
+            Global.PlayerScore = 0;
+            Global.AIScore = 0;
+
             Random random = new Random();
-            team = random.Next(2);
+            Global.PlayerTeam = random.Next(2);
             string teamName;
 
-            if (team == 0)
+            if (Global.PlayerTeam == 0)
             {
+                Global.AITeam = 1;
                 teamName = "White";
                 PlayerText.Foreground = Brushes.White;
                 ComputerText.Foreground = Brushes.Black;
             }
             else 
-            { 
+            {
+                Global.AITeam = 0;
                 teamName = "Black";
                 PlayerText.Foreground = Brushes.Black;
                 ComputerText.Foreground = Brushes.White;

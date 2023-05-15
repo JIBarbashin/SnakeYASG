@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -24,13 +18,16 @@ namespace Snake
             PartImage.Height = size;
         }
 
+        public void TransCoordToGrid()
+        {
+            Grid.SetColumn(PartImage, X);
+            Grid.SetRow(PartImage, Y);
+        }
+
         public void Draw(Grid world)
         {
             if (world.Children.Contains(PartImage))
                 world.Children.Remove(PartImage);
-
-            Grid.SetColumn(PartImage, X);
-            Grid.SetRow(PartImage, Y);
 
             world.Children.Add(PartImage);
         }

@@ -84,16 +84,27 @@ namespace Snake
             //snakeParts[0].Draw(world.GetWorld);
         }
 
+        public void TransCoordToGrid()
+        {
+            Grid.SetColumn(HeadImage, X);
+            Grid.SetRow(HeadImage, Y);
+
+            foreach (SnakePart part in snakeParts)
+                part.TransCoordToGrid();
+        }
+
         public void Draw()
         {
             if (world.GetWorld.Children.Contains(HeadImage))
                 world.GetWorld.Children.Remove(HeadImage);
 
-            Grid.SetColumn(HeadImage, X);
-            Grid.SetRow(HeadImage, Y);
-
             world.GetWorld.Children.Add(HeadImage);
 
+            DrawParts();
+        }
+
+        public void DrawParts()
+        {
             foreach (SnakePart part in snakeParts)
                 part.Draw(world.GetWorld);
         }
@@ -184,6 +195,8 @@ namespace Snake
             eatenApples++;
             snakeParts.Add(new SnakePart(this));
             world.GetApple.Init();
+            DrawParts();
+            snakeParts.Last().TransCoordToGrid();
 
             if (checkpointApples >= checkpointAllApples)
             {
@@ -196,7 +209,6 @@ namespace Snake
         private void Death()
         {
             IsAlive = false;
-            //eatenApples = 0;
         }
     }
 }

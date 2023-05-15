@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 
 namespace Snake
 {
@@ -54,7 +49,7 @@ namespace Snake
                     {
                         if (Snake.X - appleX < world.Width / 2)
                             Snake.Direction = SnakeHead.Directions.LEFT;
-                        else    
+                        else
                             Snake.Direction = SnakeHead.Directions.RIGHT;
                     }
                     else
@@ -64,6 +59,31 @@ namespace Snake
                         else
                             Snake.Direction = SnakeHead.Directions.LEFT;
                     }
+                }
+            }
+
+            if ((Snake.Direction == SnakeHead.Directions.LEFT & Snake.IsColliding(Snake.X - 1, Snake.Y)) |
+                (Snake.Direction == SnakeHead.Directions.RIGHT & Snake.IsColliding(Snake.X + 1, Snake.Y)))
+            {
+                if (Snake.IsColliding(Snake.X, Snake.Y + 1))
+                {
+                    Snake.Direction = SnakeHead.Directions.UP;
+                }
+                else
+                {
+                    Snake.Direction = SnakeHead.Directions.DOWN;
+                }
+            }
+            else if ((Snake.Direction == SnakeHead.Directions.UP & Snake.IsColliding(Snake.X, Snake.Y - 1)) |
+                (Snake.Direction == SnakeHead.Directions.DOWN & Snake.IsColliding(Snake.X, Snake.Y + 1)))
+            {
+                if (Snake.IsColliding(Snake.X + 1, Snake.Y))
+                {
+                    Snake.Direction = SnakeHead.Directions.LEFT;
+                }
+                else
+                {
+                    Snake.Direction = SnakeHead.Directions.RIGHT;
                 }
             }
         }

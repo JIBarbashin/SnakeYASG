@@ -1,24 +1,7 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Timers;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
-using static Snake.SnakeHead;
-using static System.Formats.Asn1.AsnWriter;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Snake
 {
@@ -55,7 +38,7 @@ namespace Snake
             snakeAI = new SnakeAI();
             //WinnerDisplay();
         }
-
+        
         private void timerControl_Tick(object sender, EventArgs e)
         {
             GameControls();
@@ -76,7 +59,7 @@ namespace Snake
             timerGame.Interval = TimeSpan.FromMilliseconds(400 / worldP.Speed);
 
             worldP.GetSnake.MoveSnake();
-            worldP.GetSnake.Draw();
+            worldP.GetSnake.TransCoordToGrid();
 
             if (!isAlive)
             {
@@ -92,7 +75,7 @@ namespace Snake
             timerAI.Interval = TimeSpan.FromMilliseconds(400 / worldAI.Speed);
 
             worldAI.GetSnake.MoveSnake();
-            worldAI.GetSnake.Draw();
+            worldAI.GetSnake.TransCoordToGrid();
 
             if (!isAIAlive)
             {
@@ -106,18 +89,18 @@ namespace Snake
         private void GameControls()
         {
             if ((Keyboard.GetKeyStates(Key.W) & KeyStates.Down) > 0 |
-                (Keyboard.GetKeyStates(Key.Up)    & KeyStates.Down) > 0)
+                (Keyboard.GetKeyStates(Key.Up) & KeyStates.Down) > 0)
                 worldP.GetSnake.Direction = SnakeHead.Directions.UP;
 
             else if ((Keyboard.GetKeyStates(Key.S) & KeyStates.Down) > 0 |
-                (Keyboard.GetKeyStates(Key.Down)  & KeyStates.Down) > 0)
+                (Keyboard.GetKeyStates(Key.Down) & KeyStates.Down) > 0)
                 worldP.GetSnake.Direction = SnakeHead.Directions.DOWN;
 
-            else if((Keyboard.GetKeyStates(Key.A) & KeyStates.Down) > 0 |
-                (Keyboard.GetKeyStates(Key.Left)  & KeyStates.Down) > 0)
+            else if ((Keyboard.GetKeyStates(Key.A) & KeyStates.Down) > 0 |
+                (Keyboard.GetKeyStates(Key.Left) & KeyStates.Down) > 0)
                 worldP.GetSnake.Direction = SnakeHead.Directions.LEFT;
 
-            else if((Keyboard.GetKeyStates(Key.D) & KeyStates.Down) > 0 |
+            else if ((Keyboard.GetKeyStates(Key.D) & KeyStates.Down) > 0 |
                 (Keyboard.GetKeyStates(Key.Right) & KeyStates.Down) > 0)
                 worldP.GetSnake.Direction = SnakeHead.Directions.RIGHT;
         }
@@ -142,13 +125,16 @@ namespace Snake
             worldP.GetSnake.EatenApples = 0;
             worldAI.GetSnake.EatenApples = 0;
 
+            worldP.GetSnake.Draw();
+            worldAI.GetSnake.Draw();
+
             if (!isStarted)
             {
                 isStarted = true;
 
-                timerGame.Interval = TimeSpan.FromMilliseconds(1);
-                timerAI.Interval = TimeSpan.FromMilliseconds(1);
-                timerControl.Interval = TimeSpan.FromMilliseconds(1);
+                timerGame.Interval = TimeSpan.FromTicks(1);
+                timerAI.Interval = TimeSpan.FromTicks(1);
+                timerControl.Interval = TimeSpan.FromTicks(1);
                 timerGame.Start();
                 timerAI.Start();
                 timerControl.Start();
