@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Reflection;
+using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -10,8 +12,8 @@ namespace Snake
     /// </summary>
     public partial class MainWindow : Window
     {
-        private World worldP;
-        private World worldAI;
+        private static World worldP;
+        private static World worldAI;
 
         private bool isStarted = false;
         private bool isAlive = true;
@@ -19,16 +21,16 @@ namespace Snake
 
         private SnakeAI snakeAI;
 
-        private DispatcherTimer timerGame = new DispatcherTimer();
-        private DispatcherTimer timerControl = new DispatcherTimer();
-        private DispatcherTimer timerAI = new DispatcherTimer();
+        private static DispatcherTimer timerP = new DispatcherTimer();
+        private static DispatcherTimer timerLogic = new DispatcherTimer();
+        private static DispatcherTimer timerAI = new DispatcherTimer();
 
         public MainWindow()
         {
             InitializeComponent();
 
-            timerGame.Tick += new EventHandler(timerGame_Tick);
-            timerControl.Tick += new EventHandler(timerControl_Tick);
+            timerP.Tick += new EventHandler(timerP_Tick);
+            timerLogic.Tick += new EventHandler(timerLogic_Tick);
             timerAI.Tick += new EventHandler(timerAI_Tick);
 
             RestartButton.Content = "Start!";
@@ -39,10 +41,35 @@ namespace Snake
             //WinnerDisplay();
         }
         
-        private void timerControl_Tick(object sender, EventArgs e)
+        public static void ChangeSpeed(bool isPlayer)
+        {
+            if (isPlayer)
+            {
+                if (worldP.Speed < worldP.MaxSpeed | worldAI.Speed < worldAI.MaxSpeed)
+                {
+                    worldP.Speed += 0.25;
+                    worldAI.Speed += 0.5;
+                }
+            }
+            else
+            {
+                if (worldAI.Speed < worldAI.MaxSpeed | worldP.Speed < worldP.MaxSpeed)
+                {
+                    worldP.Speed += 0.5;
+                    worldAI.Speed += 0.25;
+                }
+            }
+
+            timerP.Interval = TimeSpan.FromMilliseconds(300 / worldP.Speed);
+            timerAI.Interval = TimeSpan.FromMilliseconds(300 / worldAI.Speed);
+        }
+
+        private void timerLogic_Tick(object sender, EventArgs e)
         {
             GameControls();
-            snakeAI.Control();
+            
+            worldP.GetSnake.TransCoordToGrid();
+            worldAI.GetSnake.TransCoordToGrid();
 
             worldP.GetSnake.Collide();
             worldAI.GetSnake.Collide();
@@ -50,40 +77,28 @@ namespace Snake
             isAlive = worldP.GetSnake.IsAlive;
             isAIAlive = worldAI.GetSnake.IsAlive;
 
-            PlayerText.Text = $"Player : {worldP.GetSnake.EatenApples}/{worldP.Speed}";
-            AIText.Text = $"Computer : {worldAI.GetSnake.EatenApples}/{worldAI.Speed}";
-        }
-
-        private void timerGame_Tick(object sender, EventArgs e)
-        {
-            timerGame.Interval = TimeSpan.FromMilliseconds(400 / worldP.Speed);
-
-            worldP.GetSnake.MoveSnake();
-            worldP.GetSnake.TransCoordToGrid();
-
-            if (!isAlive)
+            if (!isAlive | !isAIAlive)
             {
-                timerGame.Stop();
+                timerP.Stop();
                 timerAI.Stop();
-                timerControl.Stop();
+                timerLogic.Stop();
                 WinnerDisplay();
             }
+
+            PlayerText.Text = $"Player : {worldP.GetSnake.EatenApples}/{worldP.Speed}";
+            AIText.Text = $"Computer : {worldAI.GetSnake.EatenApples}/{worldAI.Speed}";
+
+        }
+
+        private void timerP_Tick(object sender, EventArgs e)
+        {
+            worldP.GetSnake.MoveSnake();
         }
 
         private void timerAI_Tick(object sender, EventArgs e)
         {
-            timerAI.Interval = TimeSpan.FromMilliseconds(400 / worldAI.Speed);
-
+            snakeAI.Control();
             worldAI.GetSnake.MoveSnake();
-            worldAI.GetSnake.TransCoordToGrid();
-
-            if (!isAIAlive)
-            {
-                timerGame.Stop();
-                timerAI.Stop();
-                timerControl.Stop();
-                WinnerDisplay();
-            }
         }
 
         private void GameControls()
@@ -119,8 +134,8 @@ namespace Snake
             isAlive = true;
             isAIAlive = true;
 
-            worldP.Speed = 1;
-            worldAI.Speed = 1;
+            worldP.Speed = 12;
+            worldAI.Speed = 12;
 
             worldP.GetSnake.EatenApples = 0;
             worldAI.GetSnake.EatenApples = 0;
@@ -132,12 +147,14 @@ namespace Snake
             {
                 isStarted = true;
 
-                timerGame.Interval = TimeSpan.FromTicks(1);
-                timerAI.Interval = TimeSpan.FromTicks(1);
-                timerControl.Interval = TimeSpan.FromTicks(1);
-                timerGame.Start();
+                timerP.Interval = TimeSpan.FromMilliseconds(300 / worldP.Speed);
+                timerAI.Interval = TimeSpan.FromMilliseconds(300 / worldAI.Speed);
+
+                timerLogic.Interval = TimeSpan.FromTicks(1);
+
+                timerLogic.Start();
+                timerP.Start();
                 timerAI.Start();
-                timerControl.Start();
             }
         }
 
@@ -150,11 +167,13 @@ namespace Snake
                 winner = "Player";
 
             MessageBoxResult msg = MessageBox.Show($"{winner} is alive!\nPlayer: {worldP.GetSnake.EatenApples}\nComputer: {worldAI.GetSnake.EatenApples}", "Game over!");
+            
             if (msg == MessageBoxResult.OK)
             {
                 isStarted = false;
                 RestartButton.Content = "Start!";
             }
+            MessageBox.Show($"Collide to Tile {worldAI.GetSnake.CollidedPart}!");
         }
 
         private void RestartButton_Click(object sender, RoutedEventArgs e)
@@ -170,7 +189,7 @@ namespace Snake
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
-            System.Windows.Application.Current.Shutdown();
+            Application.Current.Shutdown();
         }
     }
 }

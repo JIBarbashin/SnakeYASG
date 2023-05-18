@@ -21,9 +21,20 @@ namespace Checkers
         private Grid boardGrid;
         private List<Piece> pieces = new List<Piece>();
 
+        private List<Piece> whitePieces = new List<Piece>();
+        private List<Piece> blackPieces = new List<Piece>();
+
         public List<Piece> Pieces
         {
             get { return pieces; }
+        }
+        public List<Piece> WhitePieces
+        {
+            get { return whitePieces; }
+        }
+        public List<Piece> BlackPieces
+        {
+            get { return blackPieces; }
         }
 
         public Grid GetBoard
@@ -91,7 +102,7 @@ namespace Checkers
                 for (j = 0; j < Size; j++)
                 {
                     if ((j % 2 == 1 & i % 2 == 0) | (j % 2 == 0 & i % 2 == 1))
-                        pieces.Add(new Piece(this, true, j, i));
+                        pieces.Add(new Piece(true, j, i));
                 }
             }
             for (i = 7; i < Size; i++)
@@ -99,7 +110,26 @@ namespace Checkers
                 for (j = 0; j < Size; j++)
                 {
                     if ((j % 2 == 1 & i % 2 == 0) | (j % 2 == 0 & i % 2 == 1))
-                        pieces.Add(new Piece(this, false, j, i));
+                        pieces.Add(new Piece(false, j, i));
+                }
+            }
+            PieceFilter();
+        }
+
+        private void PieceFilter()
+        {
+            WhitePieces.Clear();
+            BlackPieces.Clear();
+
+            foreach (Piece piece in pieces)
+            {
+                if (piece.IsWhite)
+                {
+                    WhitePieces.Add(piece);
+                }
+                else
+                {
+                    BlackPieces.Add(piece);
                 }
             }
         }

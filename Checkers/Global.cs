@@ -14,5 +14,18 @@ namespace Checkers
         public static int AITeam { get; set; }
         public static int PlayerScore { get; set; }
         public static int AIScore { get; set; }
+
+        public static void SwitchTeam()
+        {
+            if (CurrentTeam == PlayerTeam)
+            {
+                CurrentTeam = AITeam;
+                CheckersAI.Turn();
+            }
+            else
+            {
+                CurrentTeam = PlayerTeam;
+            }
+        }
     }
 }

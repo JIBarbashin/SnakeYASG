@@ -18,7 +18,7 @@ namespace Checkers
         private Rectangle targetRect = new Rectangle();
         private Piece piece; 
 
-        public Target(Grid board, Piece piece, int X, int Y)
+        public Target(Piece piece, int X, int Y)
         {
             targetRect.MouseLeftButtonDown += new MouseButtonEventHandler(target_MouseLeftButtonUp);
 
@@ -31,11 +31,18 @@ namespace Checkers
             targetRect.Width = 32;
             targetRect.Height = 32;
 
-            Grid.SetColumn(targetRect, this.X);
-            Grid.SetRow(targetRect, this.Y);
 
             if (!Global.GameBoard.GetBoard.Children.Contains(targetRect))
-                Global.GameBoard.GetBoard.Children.Add(targetRect);
+            {
+                if ((X >= 0 & Y >= 0) & (X <= Global.GameBoard.Size & Y <= Global.GameBoard.Size))
+                {
+                    Grid.SetColumn(targetRect, this.X);
+                    Grid.SetRow(targetRect, this.Y);
+
+                    if (!piece.IsColliding(piece.GetPiece(X, Y), X, Y))
+                        Global.GameBoard.GetBoard.Children.Add(targetRect);
+                }
+            }
         }
 
         void target_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -43,22 +50,6 @@ namespace Checkers
             piece.Move(X, Y);
             //Clear();
             e.Handled = true;
-        }
-
-        public void Create(int X, int Y)
-        {
-            this.X = X;
-            this.Y = Y;
-
-            targetRect.Fill = Brushes.Aqua;
-            targetRect.Width = 64;
-            targetRect.Height = 64;
-
-            Grid.SetColumn(targetRect, this.X);
-            Grid.SetRow(targetRect, this.Y);
-
-            if (!Global.GameBoard.GetBoard.Children.Contains(targetRect))
-                Global.GameBoard.GetBoard.Children.Add(targetRect);
         }
 
         public void Clear()

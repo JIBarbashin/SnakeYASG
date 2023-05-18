@@ -21,7 +21,7 @@ namespace Checkers
         private bool canBeat = false;
         private bool inDanger = false;
 
-        private Ellipse PieceEllipse = new Ellipse();
+        private Ellipse pieceEllipse = new Ellipse();
 
         private SolidColorBrush blackBrush = Brushes.Black;
         private SolidColorBrush whiteBrush = Brushes.White;
@@ -30,26 +30,39 @@ namespace Checkers
 
         private List<Target> targets = new List<Target>();
 
+        private List<Piece> piecesForBeat = new List<Piece>();
+
         public int X { get; set; }
         public int Y { get; set; }
         private int size = 32;
 
-        private List<Piece> piecesForBeat = new List<Piece>();
+        private Piece leftPiece;
+        private Piece rightPiece;
 
-        public Piece(Board board, bool isWhite, int X, int Y)
+        public bool IsWhite
         {
-            PieceEllipse.MouseLeftButtonDown += new MouseButtonEventHandler(piece_MouseLeftButtonUp);
+            get { return isWhite; }
+        }
+
+        public Ellipse PieceEllipse
+        {
+            get { return pieceEllipse; }
+        }
+
+        public Piece(bool isWhite, int X, int Y)
+        {
+            pieceEllipse.MouseLeftButtonDown += new MouseButtonEventHandler(piece_MouseLeftButtonUp);
 
             this.isWhite = isWhite;
             this.X = X;
             this.Y = Y;
 
             if (isWhite)
-                PieceEllipse.Fill = whiteBrush;
+                pieceEllipse.Fill = whiteBrush;
             else
-                PieceEllipse.Fill = blackBrush;
-            PieceEllipse.Width = size;
-            PieceEllipse.Height = size;
+                pieceEllipse.Fill = blackBrush;
+            pieceEllipse.Width = size;
+            pieceEllipse.Height = size;
 
             Draw();
             TransCoordToGrid();
@@ -59,44 +72,98 @@ namespace Checkers
         {
             if (Global.PlayerTeam == Global.CurrentTeam)
             {
-                if (!isTurning)
+                if ((Global.PlayerTeam == 0 & isWhite) | (Global.PlayerTeam == 1 & !isWhite))
                 {
-                    isTurning = true;
-                    piecesForBeat = DetectedPieces();
-                    if (canTurning)
-                        CreateTargets(2);
+                    if (!isTurning)
+                    {
+                        isTurning = true;
+                        CreateTargets();
+                    }
                     else
+                    {
                         isTurning = false;
-                }
-                else
-                {
-                    isTurning = false;
-                    ClearTargets();
+                        ClearTargets();
+                    }
                 }
             }
             e.Handled = true;
         }
 
-        private void CreateTargets(int count)
+        private void CreateTargets()
         {
-            int squares = 1;
-            if (canBeat)
-            {
-                squares = 2;
-            }
             if (isWhite)
             {
-                if (X < Global.GameBoard.Size | Y > 0)
-                    targets.Add(new Target(Global.GameBoard.GetBoard, this, X + squares, Y + squares));
-                if (X > 0 | Y > 0)
-                    targets.Add(new Target(Global.GameBoard.GetBoard, this, X - squares, Y + squares));
+                leftPiece = GetPiece(X - 1, Y + 1);
+                rightPiece = GetPiece(X + 1, Y + 1);
+
+                if (rightPiece != null)
+                {
+                    if (!rightPiece.isWhite & IsColliding(rightPiece, X + 1, Y + 1))
+                    {
+                        canBeat = true;
+                        targets.Add(new Target(this, X + 2, Y + 2));
+                    }
+                    else
+                    {
+                        targets.Add(new Target(this, X + 1, Y + 1));
+                    }
+                }
+                if (leftPiece != null)
+                {
+                    if (!leftPiece.isWhite & IsColliding(leftPiece, X - 1, Y + 1))
+                    {
+                        canBeat = true;
+                        targets.Add(new Target(this, X - 2, Y + 2));
+                    }
+                    else
+                    {
+                        targets.Add(new Target(this, X - 1, Y + 1));
+                    }
+                }
+                if (leftPiece == null | rightPiece == null)
+                {
+                    targets.Add(new Target(this, X - 1, Y + 1));
+                    targets.Add(new Target(this, X + 1, Y + 1));
+                }
             }
-            else
+            else if (!isWhite)
             {
-                if (X < Global.GameBoard.Size | Y > 0)
-                    targets.Add(new Target(Global.GameBoard.GetBoard, this, X + squares, Y - squares));
-                if (X > 0 | Y > 0)
-                    targets.Add(new Target(Global.GameBoard.GetBoard, this, X - squares, Y - squares));
+                leftPiece = GetPiece(X - 1, Y - 1);
+                rightPiece = GetPiece(X + 1, Y - 1);
+
+                if (rightPiece != null)
+                {
+                    if (rightPiece.isWhite & IsColliding(rightPiece, X + 1, Y - 1))
+                    {
+                        canBeat = true;
+                        targets.Add(new Target(this, X + 2, Y - 2));
+                    }
+                    else
+                    {
+                        targets.Add(new Target(this, X + 1, Y - 1));
+                    }
+                }
+                else if (leftPiece != null)
+                {
+                    if (leftPiece.isWhite & IsColliding(leftPiece, X - 1, Y - 1))
+                    {
+                        canBeat = true;
+                        targets.Add(new Target(this, X - 2, Y - 2));
+                    }
+                    else
+                    {
+                        targets.Add(new Target(this, X - 1, Y - 1));
+                    }
+                }
+                if (leftPiece == null | rightPiece == null)
+                {
+                    targets.Add(new Target(this, X - 1, Y - 1));
+                    targets.Add(new Target(this, X + 1, Y - 1));
+                }
+            }
+            else if (isKing)
+            {
+                
             }
         }
 
@@ -113,39 +180,33 @@ namespace Checkers
         {
             isKing = true;
             if (isWhite)
-                PieceEllipse.Fill = whiteKingBrush;
+                pieceEllipse.Fill = whiteKingBrush;
             else
-                PieceEllipse.Fill = blackKingBrush;
+                pieceEllipse.Fill = blackKingBrush;
         }
 
-        private List<Piece> DetectedPieces(int squares = 1)
+        public Piece GetPiece(int X, int Y)
         {
-            List<Piece> result = new List<Piece>();
             foreach (Piece piece in Global.GameBoard.Pieces)
             {
-                if (IsColliding(piece.X, piece.Y, squares, squares))
+                if (piece.X == X & piece.Y == Y)
                 {
-                    if (isWhite != piece.isWhite)
-                    {
-                        result.Add(piece);
-                        canBeat = true;
-
-                        if (IsColliding(piece.X, piece.Y, 1, 1))
-                            canTurning = false;
-                    }
-                    //if ()
-                    return result;
-                    //else
-                    //    canTurning = false;
+                    return piece;
                 }
             }
-            return result;
+            return null;
         }
 
-        private bool IsColliding(int X, int Y, int diff1 = 0, int diff2 = 0)
+        public bool IsColliding(Piece p, int X, int Y)
         {
-            if ((this.X == X + diff1 & this.Y == Y + diff2))
-                return true;
+            if (p != null)
+            {
+                if (p.X == X & p.Y == Y)
+                {
+                    return true;
+                }
+                else return false;
+            }
             else return false;
         }
 
@@ -159,51 +220,50 @@ namespace Checkers
 
             if (canBeat)
             {
-                bool killed = false;
-                foreach (Piece piece in piecesForBeat)
-                {
-                    if (IsColliding(piece.X, piece.Y, 1, 1))
-                    {
-                        killed = true;
-                        piece.Clear();
-
-                    }
-                }
-                if (!killed)
-                {
-                    Clear();
-                }
+                if (leftPiece != null)
+                    KillPiece(leftPiece);
+                if (rightPiece != null)
+                    KillPiece(rightPiece);
             }
 
-            if ((isWhite & this.Y == 0) | (!isWhite & this.Y == Global.GameBoard.Size))
+            if ((isWhite & this.Y == Global.GameBoard.Size) | (!isWhite & this.Y == 0))
                 PieceKing();
 
-            if (Global.CurrentTeam == Global.PlayerTeam)
-                Global.CurrentTeam = Global.AITeam;
-            else
-                Global.CurrentTeam = Global.PlayerTeam;
+            Global.SwitchTeam();
         }
 
-        private void MouseDown(object sender, MouseEventArgs e)
+        private void KillPiece(Piece p)
         {
-            //do something here
+            bool killed = false;
+            if ((IsColliding(this, p.X + 1, p.Y + 1)) |
+                (IsColliding(this, p.X - 1, p.Y - 1)) |
+                (IsColliding(this, p.X + 1, p.Y - 1)) |
+                (IsColliding(this, p.X - 1, p.Y + 1)))
+            {
+                killed = true;
+                p.Clear();
+            }
+            if (!killed)
+            {
+                Clear();
+            }
         }
 
         private void TransCoordToGrid()
         {
-            Grid.SetColumn(PieceEllipse, X);
-            Grid.SetRow(PieceEllipse, Y);
+            Grid.SetColumn(pieceEllipse, X);
+            Grid.SetRow(pieceEllipse, Y);
         }
 
         private void Draw()
         {
-            if (!Global.GameBoard.GetBoard.Children.Contains(PieceEllipse))
-                Global.GameBoard.GetBoard.Children.Add(PieceEllipse);
+            if (!Global.GameBoard.GetBoard.Children.Contains(pieceEllipse))
+                Global.GameBoard.GetBoard.Children.Add(pieceEllipse);
         }
 
         private void Clear()
         {
-            Global.GameBoard.GetBoard.Children.Remove(PieceEllipse);
+            Global.GameBoard.GetBoard.Children.Remove(pieceEllipse);
             Global.GameBoard.Pieces.Remove(this);
         }
     }

@@ -56,7 +56,7 @@ namespace Checkers
             }
 
             MessageBox.Show($"You are {teamName}");
-
+            CheckersAI.Init();
             world.Clear();
             world.CreateBoard();
             world.PiecePlacement();

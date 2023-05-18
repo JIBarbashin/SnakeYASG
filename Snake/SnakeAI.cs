@@ -7,12 +7,10 @@ namespace Snake
         public SnakeHead Snake { get; set; }
         private Apple apple;
         private World world;
-        private Grid grid;
 
         public void Init()
         {
             world = Snake.GetWorld;
-            grid = world.GetWorld;
             apple = world.GetApple;
         }
 
@@ -74,7 +72,7 @@ namespace Snake
                     Snake.Direction = SnakeHead.Directions.DOWN;
                 }
             }
-            else if ((Snake.Direction == SnakeHead.Directions.UP & Snake.IsColliding(Snake.X, Snake.Y - 1)) |
+            if ((Snake.Direction == SnakeHead.Directions.UP & Snake.IsColliding(Snake.X, Snake.Y - 1)) |
                 (Snake.Direction == SnakeHead.Directions.DOWN & Snake.IsColliding(Snake.X, Snake.Y + 1)))
             {
                 if (Snake.IsColliding(Snake.X + 1, Snake.Y))

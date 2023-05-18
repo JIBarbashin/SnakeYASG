@@ -9,7 +9,7 @@ namespace Snake
         public int X { get; set; }
         public int Y { get; set; }
         private Ellipse PartImage = new Ellipse();
-        private int size = 32;
+        private int size = 10;
 
         public SnakePart(SnakeHead snake)
         {

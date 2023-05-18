@@ -5,9 +5,12 @@ namespace Snake
     internal class World
     {
         public double Speed { get; set; } = 5;
-        public double MaxSpeed { get; set; } = 7.5;
-        public int Width { get; set; } = 16;
-        public int Height { get; set; } = 16;
+        public double MaxSpeed { get; set; } = 25;
+        public double MinSpeed { get; set; } = 0.5;
+        public int Width { get; set; } = 50;
+        public int Height { get; set; } = 50;
+
+        public bool IsPlayer { get; set; }
 
         private SnakeHead snake;
         private Apple apple;
@@ -30,14 +33,15 @@ namespace Snake
             get { return apple; }
         }
 
-        public World(Grid world, bool isPlayer)
+        public World(Grid world, bool IsPlayer)
         {
             this.world = world;
+            this.IsPlayer = IsPlayer;
         }
 
         public void Create()
         {
-            snake = new SnakeHead(this);
+            snake = new SnakeHead(this, IsPlayer);
             apple = new Apple(this);
 
             for (int i = 0; i < Width; i++)

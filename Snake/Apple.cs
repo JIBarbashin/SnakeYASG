@@ -10,7 +10,7 @@ namespace Snake
         public int X { get; set; }
         public int Y { get; set; }
         private Ellipse appleImage = new Ellipse();
-        private int size = 32;
+        private int size = 10;
         public int Score { get; set; }
         private Random random = new Random();
 
@@ -43,6 +43,8 @@ namespace Snake
 
                 if (!world.GetSnake.IsColliding(X, Y))
                     spawned = true;
+                else
+                    spawned = false;
             }
             Score = 1;
             SetCoord();

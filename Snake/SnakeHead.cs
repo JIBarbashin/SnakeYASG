@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Media;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
@@ -18,11 +21,12 @@ namespace Snake
         public enum Directions { UP, DOWN, LEFT, RIGHT};
         private Directions direction = Directions.LEFT;
         public bool IsAlive { get; set; } = true;
+        public bool IsPlayer { get; set; } = false;
 
         public int X { get; set; }
         public int Y { get; set; }
 
-        private int size = 38;
+        private int size = 12;
 
         public Ellipse HeadImage = new Ellipse();
 
@@ -32,6 +36,11 @@ namespace Snake
         private int checkpointAllApples = 5;
 
         private World world;
+
+        private int collidedPart = 0;
+        public int CollidedPart { get { return collidedPart; } }
+
+        private SoundPlayer sp = new SoundPlayer();
 
         public World GetWorld
         {
@@ -67,9 +76,10 @@ namespace Snake
             }
         }
 
-        public SnakeHead(World world)
+        public SnakeHead(World world, bool IsPlayer)
         {
             this.world = world;
+            this.IsPlayer = IsPlayer;
 
             X = world.Width / 2;
             Y = world.Height / 2;
@@ -154,10 +164,10 @@ namespace Snake
 
         public void Collide()
         {
-            foreach (SnakePart part in snakeParts)
+            for (int i = 0; i < snakeParts.Count; i++)
             {
-                if (X == part.X & Y == part.Y)
-                    Death();
+                if (X == snakeParts[i].X & Y == snakeParts[i].Y)
+                    Death(i);
             }
             if (X == world.GetApple.X & Y == world.GetApple.Y)
                 Eat();
@@ -191,23 +201,36 @@ namespace Snake
 
         private void Eat()
         {
+            sp.SoundLocation = "coin_sound.wav";
+            sp.Load();
+            sp.Play();
+
+            int x = snakeParts.Last().X;
+            int y = snakeParts.Last().Y;
+
             checkpointApples++;
             eatenApples++;
             snakeParts.Add(new SnakePart(this));
             world.GetApple.Init();
             DrawParts();
+            snakeParts.Last().X = x;
+            snakeParts.Last().Y = y;
             snakeParts.Last().TransCoordToGrid();
 
             if (checkpointApples >= checkpointAllApples)
             {
                 checkpointApples = 0;
-                if (world.Speed < world.MaxSpeed)
-                    world.Speed += 0.5;
+                MainWindow.ChangeSpeed(IsPlayer);
             }
         }
 
-        private void Death()
+        private void Death(int index)
         {
+            //sp.SoundLocation = "death_from_cringe.wav";
+            //sp.Load();
+            //sp.Play();
+
+            collidedPart = index;
             IsAlive = false;
         }
     }
