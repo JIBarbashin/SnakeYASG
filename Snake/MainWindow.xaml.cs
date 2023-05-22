@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Reflection;
-using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -40,7 +38,7 @@ namespace Snake
             snakeAI = new SnakeAI();
             //WinnerDisplay();
         }
-        
+
         public static void ChangeSpeed(bool isPlayer)
         {
             if (isPlayer)
@@ -67,7 +65,7 @@ namespace Snake
         private void timerLogic_Tick(object sender, EventArgs e)
         {
             GameControls();
-            
+
             worldP.GetSnake.TransCoordToGrid();
             worldAI.GetSnake.TransCoordToGrid();
 
@@ -167,13 +165,13 @@ namespace Snake
                 winner = "Player";
 
             MessageBoxResult msg = MessageBox.Show($"{winner} is alive!\nPlayer: {worldP.GetSnake.EatenApples}\nComputer: {worldAI.GetSnake.EatenApples}", "Game over!");
-            
+
             if (msg == MessageBoxResult.OK)
             {
                 isStarted = false;
                 RestartButton.Content = "Start!";
             }
-            MessageBox.Show($"Collide to Tile {worldAI.GetSnake.CollidedPart}!");
+            //MessageBox.Show($"Collide to Tile {worldAI.GetSnake.CollidedPart}!");
         }
 
         private void RestartButton_Click(object sender, RoutedEventArgs e)

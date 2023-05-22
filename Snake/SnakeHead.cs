@@ -1,15 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Media;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -17,8 +9,8 @@ using System.Windows.Shapes;
 namespace Snake
 {
     internal class SnakeHead
-    { 
-        public enum Directions { UP, DOWN, LEFT, RIGHT};
+    {
+        public enum Directions { UP, DOWN, LEFT, RIGHT };
         private Directions direction = Directions.LEFT;
         public bool IsAlive { get; set; } = true;
         public bool IsPlayer { get; set; } = false;
@@ -61,7 +53,7 @@ namespace Snake
         public Directions Direction
         {
             get { return direction; }
-            set 
+            set
             {
                 Directions prevDirection = direction;
                 if (prevDirection == Directions.UP & value == Directions.DOWN)
@@ -190,7 +182,7 @@ namespace Snake
                         col = true;
                         break;
                     }
-                    else 
+                    else
                     {
                         col = false;
                     }
@@ -226,9 +218,9 @@ namespace Snake
 
         private void Death(int index)
         {
-            //sp.SoundLocation = "death_from_cringe.wav";
-            //sp.Load();
-            //sp.Play();
+            sp.SoundLocation = "death_from_cringe.wav";
+            sp.Load();
+            sp.Play();
 
             collidedPart = index;
             IsAlive = false;
