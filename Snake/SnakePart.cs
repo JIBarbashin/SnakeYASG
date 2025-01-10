@@ -4,32 +4,27 @@ using System.Windows.Shapes;
 
 namespace Snake
 {
-    internal class SnakePart
+    public class SnakePart : GameObject
     {
         public int X { get; set; }
         public int Y { get; set; }
-        private Ellipse PartImage = new Ellipse();
-        private int size = 10;
+        public Ellipse PartImage { get => partImage; }
 
-        public SnakePart(SnakeHead snake)
-        {
-            PartImage.Fill = Brushes.Green;
-            PartImage.Width = size;
-            PartImage.Height = size;
-        }
+        private Ellipse partImage = new();
 
-        public void TransCoordToGrid()
+        public SnakePart()
         {
-            Grid.SetColumn(PartImage, X);
-            Grid.SetRow(PartImage, Y);
+            partImage.Fill = Brushes.Green;
+            partImage.Width = Size;
+            partImage.Height = Size;
         }
 
         public void Draw(Grid world)
         {
-            if (world.Children.Contains(PartImage))
-                world.Children.Remove(PartImage);
+            if (world.Children.Contains(partImage))
+                world.Children.Remove(partImage);
 
-            world.Children.Add(PartImage);
+            world.Children.Add(partImage);
         }
     }
 }

@@ -8,46 +8,25 @@ using System.Windows.Shapes;
 
 namespace Snake
 {
-    internal class SnakeHead
+    public class SnakeHead : GameObject
     {
         public enum Directions { UP, DOWN, LEFT, RIGHT };
         private Directions direction = Directions.LEFT;
         public bool IsAlive { get; set; } = true;
-        public bool IsPlayer { get; set; } = false;
 
-        public int X { get; set; }
-        public int Y { get; set; }
+        public int Speed { get; set; }
 
-        private int size = 12;
-
-        public Ellipse HeadImage = new Ellipse();
-
-        private List<SnakePart> snakeParts = new List<SnakePart>();
-        private int eatenApples;
-        private int checkpointApples = 0;
-        private int checkpointAllApples = 5;
-
-        private World world;
+        public Ellipse HeadImage = new();
+        private List<SnakePart> snakeParts = new();
 
         private int collidedPart = 0;
         public int CollidedPart { get { return collidedPart; } }
 
-        private SoundPlayer sp = new SoundPlayer();
-
-        public World GetWorld
-        {
-            get { return world; }
-        }
+        private SoundPlayer sp = new();
 
         public List<SnakePart> SnakeParts
         {
             get { return snakeParts; }
-        }
-
-        public int EatenApples
-        {
-            get { return eatenApples; }
-            set { eatenApples = value; }
         }
 
         public Directions Direction
@@ -68,50 +47,49 @@ namespace Snake
             }
         }
 
-        public SnakeHead(World world, bool IsPlayer)
+        public SnakeHead(int x, int y)
         {
-            this.world = world;
-            this.IsPlayer = IsPlayer;
+            X = x;
+            Y = y;
 
-            X = world.Width / 2;
-            Y = world.Height / 2;
+            Size = 12;
 
             HeadImage.Fill = Brushes.DarkGreen;
-            HeadImage.Width = size;
-            HeadImage.Height = size;
+            HeadImage.Width = Size;
+            HeadImage.Height = Size;
 
-            snakeParts.Add(new SnakePart(this));
+            snakeParts.Add(new SnakePart());
 
             //Draw();
             //snakeParts[0].Draw(world.GetWorld);
         }
 
-        public void TransCoordToGrid()
-        {
-            Grid.SetColumn(HeadImage, X);
-            Grid.SetRow(HeadImage, Y);
+        //public void TransCoordToGrid()
+        //{
+        //    Grid.SetColumn(HeadImage, X);
+        //    Grid.SetRow(HeadImage, Y);
 
+        //    foreach (SnakePart part in snakeParts)
+        //        part.TransCoordToGrid();
+        //}
+
+        public void Draw(ref Grid world)
+        {
+            if (world.Children.Contains(HeadImage))
+                world.Children.Remove(HeadImage);
+
+            world.Children.Add(HeadImage);
+
+            DrawParts(ref world);
+        }
+
+        public void DrawParts(ref Grid world)
+        {
             foreach (SnakePart part in snakeParts)
-                part.TransCoordToGrid();
+                part.Draw(world);
         }
 
-        public void Draw()
-        {
-            if (world.GetWorld.Children.Contains(HeadImage))
-                world.GetWorld.Children.Remove(HeadImage);
-
-            world.GetWorld.Children.Add(HeadImage);
-
-            DrawParts();
-        }
-
-        public void DrawParts()
-        {
-            foreach (SnakePart part in snakeParts)
-                part.Draw(world.GetWorld);
-        }
-
-        public void MoveSnake()
+        public void Move()
         {
             int headPrevX = X;
             int headPrevY = Y;
@@ -139,30 +117,7 @@ namespace Snake
                     partPrevX = partPrev2X;
                     partPrevY = partPrev2Y;
                 }
-                for (int i = 0; i < snakeParts.Count; i++)
-                {
-                    if (snakeParts[i].Y < 0) snakeParts[i].Y = world.Height - 1;
-                    if (snakeParts[i].X < 0) snakeParts[i].X = world.Width - 1;
-                    if (snakeParts[i].Y > world.Height - 1) snakeParts[i].Y = 0;
-                    if (snakeParts[i].X > world.Width - 1) snakeParts[i].X = 0;
-                }
             }
-
-            if (Y < 0) Y = world.Height - 1;
-            if (X < 0) X = world.Width - 1;
-            if (Y > world.Height - 1) Y = 0;
-            if (X > world.Width - 1) X = 0;
-        }
-
-        public void Collide()
-        {
-            for (int i = 0; i < snakeParts.Count; i++)
-            {
-                if (X == snakeParts[i].X & Y == snakeParts[i].Y)
-                    Death(i);
-            }
-            if (X == world.GetApple.X & Y == world.GetApple.Y)
-                Eat();
         }
 
         public bool IsColliding(int x, int y)
@@ -191,36 +146,37 @@ namespace Snake
             return col;
         }
 
-        private void Eat()
+        public void Eat(ref Apple apple)
         {
-            sp.SoundLocation = "coin_sound.wav";
-            sp.Load();
-            sp.Play();
+            //sp.SoundLocation = "coin_sound.wav";
+            //sp.Load();
+            //sp.Play();
 
             int x = snakeParts.Last().X;
             int y = snakeParts.Last().Y;
 
-            checkpointApples++;
-            eatenApples++;
-            snakeParts.Add(new SnakePart(this));
-            world.GetApple.Init();
-            DrawParts();
+            //checkpointApples++;
+            //eatenApples++;
+            snakeParts.Add(new SnakePart());
+            apple.Init();
+            //DrawParts();
             snakeParts.Last().X = x;
             snakeParts.Last().Y = y;
-            snakeParts.Last().TransCoordToGrid();
+            //snakeParts.Last().TransCoordToGrid();
+            World.TransCoordToGrid(snakeParts.Last().PartImage, snakeParts.Last().X, snakeParts.Last().Y);
 
-            if (checkpointApples >= checkpointAllApples)
-            {
-                checkpointApples = 0;
-                MainWindow.ChangeSpeed(IsPlayer);
-            }
+            //if (checkpointApples >= checkpointAllApples)
+            //{
+            //    checkpointApples = 0;
+            //    Game.Instance.ChangeSpeed(IsPlayer);
+            //}
         }
 
-        private void Death(int index)
+        public void Death(int index)
         {
-            sp.SoundLocation = "death_from_cringe.wav";
-            sp.Load();
-            sp.Play();
+            //sp.SoundLocation = "death_from_cringe.wav";
+            //sp.Load();
+            //sp.Play();
 
             collidedPart = index;
             IsAlive = false;
