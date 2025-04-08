@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnakeYASG", "SnakeGame\SnakeYASG.csproj", "{E39D0F7C-A6E5-4EDC-AEFB-393973158F0D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SnakeYASG", "SnakeYASG\SnakeYASG.csproj", "{1A470B2E-5F94-3ABC-5E8B-C276EE076D26}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E39D0F7C-A6E5-4EDC-AEFB-393973158F0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E39D0F7C-A6E5-4EDC-AEFB-393973158F0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E39D0F7C-A6E5-4EDC-AEFB-393973158F0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E39D0F7C-A6E5-4EDC-AEFB-393973158F0D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A470B2E-5F94-3ABC-5E8B-C276EE076D26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A470B2E-5F94-3ABC-5E8B-C276EE076D26}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A470B2E-5F94-3ABC-5E8B-C276EE076D26}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A470B2E-5F94-3ABC-5E8B-C276EE076D26}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
